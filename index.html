@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Security headers -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; font-src 'none'; img-src 'none'; script-src 'none'; connect-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none';" />
+  <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+  <meta http-equiv="X-Frame-Options" content="DENY" />
+  <meta http-equiv="Referrer-Policy" content="no-referrer" />
+  <meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()" />
+  <meta name="robots" content="noindex, nofollow" />
+
+  <title>Privileged Response Group</title>
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg:        #111110;
+      --surface:   #1a1a18;
+      --border:    #303030;
+      --dim:       #606058;
+      --muted:     #969690;
+      --body:      #c8c7c0;
+      --heading:   #f0ede6;
+      --accent:    #d4621a;
+      --accent-hi: #e8742a;
+      --accent-lo: #2a1a0a;
+    }
+
+    html, body { height: 100%; }
+
+    body {
+      background: var(--bg);
+      color: var(--body);
+      font-family: 'Palatino Linotype', Palatino, 'Book Antiqua', Georgia, serif;
+      font-size: 16px;
+      line-height: 1.75;
+      min-height: 100vh;
+    }
+
+    /* ── Layout ── */
+
+    .wrapper {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 0 40px;
+    }
+
+    /* ── Top bar ── */
+
+    .topbar {
+      border-bottom: 1px solid var(--border);
+      padding: 18px 0;
+    }
+
+    .topbar-inner {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .wordmark {
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 11px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--heading);
+    }
+
+    .badge {
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 9px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--muted);
+      border: 1px solid var(--border);
+      padding: 4px 10px;
+    }
+
+    /* ── Hero ── */
+
+    .hero {
+      padding: 80px 0 64px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .hero-eyebrow {
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 9px;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 24px;
+    }
+
+    .hero-title {
+      font-size: clamp(28px, 4vw, 42px);
+      font-weight: normal;
+      line-height: 1.25;
+      color: var(--heading);
+      max-width: 560px;
+      margin-bottom: 28px;
+    }
+
+    .hero-sub {
+      font-size: 16px;
+      color: var(--muted);
+      max-width: 500px;
+      line-height: 1.8;
+      margin-bottom: 40px;
+    }
+
+    /* ── Request Contact button ── */
+
+    .btn-request {
+      display: inline-block;
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 10px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--bg);
+      background: var(--accent);
+      padding: 13px 28px;
+      text-decoration: none;
+      transition: background 0.15s ease;
+    }
+
+    .btn-request:hover {
+      background: var(--accent-hi);
+    }
+
+    /* ── Section shared ── */
+
+    .section {
+      padding: 52px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .section-label {
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 9px;
+      letter-spacing: 0.26em;
+      text-transform: uppercase;
+      color: var(--dim);
+      margin-bottom: 32px;
+    }
+
+    /* ── Memoranda scroll ── */
+
+    .memo-scroll {
+      display: flex;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: thin;
+      scrollbar-color: var(--border) transparent;
+      border: 1px solid var(--border);
+    }
+
+    .memo-scroll::-webkit-scrollbar { height: 3px; }
+    .memo-scroll::-webkit-scrollbar-track { background: transparent; }
+    .memo-scroll::-webkit-scrollbar-thumb { background: var(--dim); }
+
+    .memo-card {
+      flex: 0 0 100%;
+      scroll-snap-align: start;
+      padding: 36px 40px;
+      border-right: 1px solid var(--border);
+      background: var(--surface);
+    }
+
+    .memo-card:last-child { border-right: none; }
+
+    .memo-meta {
+      display: flex;
+      gap: 24px;
+      margin-bottom: 18px;
+      align-items: baseline;
+    }
+
+    .memo-num {
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 9px;
+      letter-spacing: 0.2em;
+      color: var(--accent);
+    }
+
+    .memo-date {
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 9px;
+      letter-spacing: 0.14em;
+      color: var(--dim);
+    }
+
+    .memo-title {
+      font-size: 18px;
+      color: var(--heading);
+      font-weight: normal;
+      margin-bottom: 16px;
+      line-height: 1.35;
+      max-width: 600px;
+    }
+
+    .memo-body {
+      font-size: 14.5px;
+      color: var(--body);
+      line-height: 1.85;
+      max-width: 680px;
+    }
+
+    .memo-pagination {
+      display: flex;
+      gap: 8px;
+      margin-top: 20px;
+    }
+
+    .memo-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--border);
+      transition: background 0.2s;
+    }
+
+    .memo-dot.active { background: var(--accent); }
+
+    /* ── Practice areas ── */
+
+    .practice-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+    }
+
+    .practice-cell {
+      background: var(--bg);
+      padding: 28px 32px;
+    }
+
+    .practice-cell-num {
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 9px;
+      letter-spacing: 0.2em;
+      color: var(--dim);
+      margin-bottom: 10px;
+    }
+
+    .practice-cell-name {
+      font-size: 17px;
+      color: var(--heading);
+      margin-bottom: 8px;
+    }
+
+    .practice-cell-desc {
+      font-size: 13.5px;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    /* ── Contact ── */
+
+    .contact-strip {
+      padding: 52px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .contact-row {
+      display: flex;
+      gap: 64px;
+      flex-wrap: wrap;
+      margin-top: 32px;
+    }
+
+    .contact-item-label {
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 9px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--dim);
+      margin-bottom: 6px;
+    }
+
+    .contact-item-value {
+      font-size: 16px;
+      color: var(--body);
+    }
+
+    .contact-item-value a {
+      color: var(--body);
+      text-decoration: none;
+    }
+
+    .contact-item-value a:hover { color: var(--accent); }
+
+    .pgp-block {
+      margin-top: 36px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 20px 24px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .pgp-icon {
+      flex-shrink: 0;
+      width: 28px;
+      height: 28px;
+      border: 1px solid var(--dim);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .pgp-icon svg {
+      width: 14px;
+      height: 14px;
+      fill: none;
+      stroke: var(--muted);
+      stroke-width: 1.5;
+    }
+
+    .pgp-text {
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 10px;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    .pgp-fingerprint {
+      color: var(--dim);
+      margin-top: 2px;
+      letter-spacing: 0.12em;
+    }
+
+    /* ── Encryption notice ── */
+
+    .enc-notice {
+      padding: 36px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .enc-inner {
+      display: flex;
+      gap: 20px;
+      align-items: flex-start;
+    }
+
+    .enc-dot {
+      flex-shrink: 0;
+      margin-top: 7px;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+    }
+
+    .enc-body {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.9;
+      max-width: 640px;
+    }
+
+    /* ── Footer ── */
+
+    footer { padding: 36px 0 48px; }
+
+    .footer-inner {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 32px;
+      flex-wrap: wrap;
+    }
+
+    .footer-disclaimer {
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 9px;
+      letter-spacing: 0.1em;
+      color: var(--dim);
+      line-height: 2;
+      max-width: 500px;
+    }
+
+    .footer-license {
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 9px;
+      letter-spacing: 0.12em;
+      color: var(--dim);
+      text-align: right;
+      line-height: 2;
+    }
+
+    /* ── Responsive ── */
+
+    @media (max-width: 600px) {
+      .wrapper { padding: 0 20px; }
+      .practice-grid { grid-template-columns: 1fr; }
+      .contact-row { gap: 28px; }
+      .footer-inner { flex-direction: column; gap: 16px; }
+      .footer-license { text-align: left; }
+      .hero { padding: 56px 0 48px; }
+      .memo-card { padding: 28px 24px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── Top bar ── -->
+  <div class="topbar">
+    <div class="wrapper">
+      <div class="topbar-inner">
+        <div class="wordmark">Privileged Response Group</div>
+        <div class="badge">Western U.S.A.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Hero ── -->
+  <section class="hero">
+    <div class="wrapper">
+      <div class="hero-eyebrow">Cyber Incident Counsel</div>
+      <h1 class="hero-title">Confidential breach response for organizations under threat.</h1>
+      <p class="hero-sub">Retained under privilege from first contact. Rapid, discrete, and defensible — from initial triage through resolution.</p>
+      <a href="mailto:intake@privilegedresponse.com" class="btn-request">Request Contact</a>
+    </div>
+  </section>
+
+  <!-- ── Memoranda ── -->
+  <section class="section">
+    <div class="wrapper">
+      <div class="section-label">Memoranda</div>
+      <div class="memo-scroll" id="memoScroll">
+
+        <article class="memo-card">
+          <div class="memo-meta">
+            <span class="memo-num">01</span>
+            <span class="memo-date">April 2025</span>
+          </div>
+          <h2 class="memo-title">The Attorney-Client Privilege in Breach Response: What Counsel Protects</h2>
+          <p class="memo-body">When organizations suffer a data breach, the instinct is to act immediately — engage forensics, notify regulators, communicate to customers. But speed without structure can waive protections that are nearly impossible to restore. Retaining counsel first ensures that forensic work, root-cause analysis, and internal findings are conducted under privilege, shielded from discovery in subsequent litigation or regulatory proceedings. The distinction between privileged and non-privileged investigation work is not automatic — it must be deliberately established from the outset of the engagement.</p>
+          <div class="memo-pagination">
+            <div class="memo-dot active"></div>
+            <div class="memo-dot"></div>
+            <div class="memo-dot"></div>
+          </div>
+        </article>
+
+        <article class="memo-card">
+          <div class="memo-meta">
+            <span class="memo-num">02</span>
+            <span class="memo-date">February 2025</span>
+          </div>
+          <h2 class="memo-title">California's Expanded Breach Notification Obligations Under SB 1386 Amendments</h2>
+          <p class="memo-body">California's breach notification framework has grown more demanding with successive amendments. Organizations operating in the state must notify affected residents without unreasonable delay — typically within 30 days of discovery — when defined categories of personal information are compromised. Notification content requirements are now prescriptive, mandating specific language about what occurred, what data was affected, and what remediation steps are available. Counsel should be engaged before any notification is drafted to ensure content, timing, and delivery method satisfy both statute and applicable regulatory expectations.</p>
+          <div class="memo-pagination">
+            <div class="memo-dot"></div>
+            <div class="memo-dot active"></div>
+            <div class="memo-dot"></div>
+          </div>
+        </article>
+
+        <article class="memo-card">
+          <div class="memo-meta">
+            <span class="memo-num">03</span>
+            <span class="memo-date">December 2024</span>
+          </div>
+          <h2 class="memo-title">Ransomware Response: Legal Considerations Before You Engage the Threat Actor</h2>
+          <p class="memo-body">Ransomware incidents present a distinct legal layer that many organizations overlook in the urgency of recovery. Before any payment is considered — or before engaging directly with a threat actor — counsel must assess OFAC sanctions exposure, since certain ransomware operators are designated entities whose payment constitutes a federal violation regardless of intent. Beyond sanctions, organizations must evaluate notification obligations triggered by the event itself, separate from any decision to pay. Documented legal review of these questions, conducted under privilege, is essential to demonstrating a defensible, good-faith response posture.</p>
+          <div class="memo-pagination">
+            <div class="memo-dot"></div>
+            <div class="memo-dot"></div>
+            <div class="memo-dot active"></div>
+          </div>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Practice areas ── -->
+  <section class="section">
+    <div class="wrapper">
+      <div class="section-label">Practice Areas</div>
+      <div class="practice-grid">
+        <div class="practice-cell">
+          <div class="practice-cell-num">01</div>
+          <div class="practice-cell-name">Breach Response</div>
+          <div class="practice-cell-desc">Privilege-protected incident management, forensic coordination, and regulatory notification counsel.</div>
+        </div>
+        <div class="practice-cell">
+          <div class="practice-cell-num">02</div>
+          <div class="practice-cell-name">Privacy Counsel</div>
+          <div class="practice-cell-desc">CCPA, HIPAA, and sector-specific compliance. Data mapping, risk assessment, and program design.</div>
+        </div>
+        <div class="practice-cell">
+          <div class="practice-cell-num">03</div>
+          <div class="practice-cell-name">Investigations</div>
+          <div class="practice-cell-desc">Internal and regulatory investigations. Evidence preservation, scope containment, and disclosure strategy.</div>
+        </div>
+        <div class="practice-cell">
+          <div class="practice-cell-num">04</div>
+          <div class="practice-cell-name">Dispute Resolution</div>
+          <div class="practice-cell-desc">Litigation support, arbitration, and negotiated resolution of privacy and data security disputes.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Contact ── -->
+  <section class="contact-strip">
+    <div class="wrapper">
+      <div class="section-label">Contact</div>
+      <div class="contact-row">
+        <div class="contact-item">
+          <div class="contact-item-label">Phone</div>
+          <div class="contact-item-value">(559) 555-0100</div>
+        </div>
+        <div class="contact-item">
+          <div class="contact-item-label">Signal</div>
+          <div class="contact-item-value">(559) 555-0101</div>
+        </div>
+        <div class="contact-item">
+          <div class="contact-item-label">Encrypted Mail</div>
+          <div class="contact-item-value">
+            <a href="mailto:intake@privilegedresponse.com">intake@privilegedresponse.com</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="pgp-block">
+        <div class="pgp-icon">
+          <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <rect x="2" y="7" width="12" height="8" rx="1"/>
+            <path d="M5 7V5a3 3 0 0 1 6 0v2"/>
+          </svg>
+        </div>
+        <div class="pgp-text">
+          PGP encryption available for all correspondence.
+          <div class="pgp-fingerprint">Fingerprint: A1B2 C3D4 E5F6 7890 AB12 &middot; CD34 EF56 7890 1234 ABCD</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Encryption notice ── -->
+  <div class="enc-notice">
+    <div class="wrapper">
+      <div class="enc-inner">
+        <div class="enc-dot" aria-hidden="true"></div>
+        <p class="enc-body">
+          This site loads no external resources, sets no cookies, executes no scripts, and transmits no telemetry.
+          All contact channels support end-to-end encryption. Matters are handled under attorney-client privilege from initial engagement.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Footer ── -->
+  <footer>
+    <div class="wrapper">
+      <div class="footer-inner">
+        <div class="footer-disclaimer">
+          No attorney-client relationship is formed by visiting this site.<br />
+          All matters subject to conflict check and formal engagement.<br />
+          Licensed in California. Remote national response available.
+        </div>
+        <div class="footer-license">
+          &copy; Privileged Response Group<br />
+          All rights reserved.
+        </div>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>
